@@ -43,6 +43,11 @@
 @property (nonatomic, readonly) UIView *reorderDragView;
 
 /**
+ * Whether to limit the drag target to the accessory view or the entire cell (default NO).
+**/
+@property (nonatomic) BOOL limitDragTargetToAccessoryView;
+
+/**
  Provide your UITableViewCell subclass to set the appeareance of the temporary empty cell during dragging. An empty UITableViewCell is used by default, which leaves the empty space white.
  */
 - (void)registerTemporaryEmptyCellClass:(Class)cellClass;

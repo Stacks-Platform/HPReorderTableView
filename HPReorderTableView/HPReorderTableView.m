@@ -46,7 +46,7 @@ static NSTimeInterval HPReorderTableViewAnimationDuration = 0.2;
 
 static NSString *HPReorderTableViewCellReuseIdentifier = @"HPReorderTableViewCellReuseIdentifier";
 
-@synthesize reorderDragView = _reorderDragView;
+@synthesize reorderDragView = _reorderDragView, limitDragTargetToAccessoryView=_limitDragTargetToAccessoryView;
 
 - (id)initWithCoder:(NSCoder *)aDecoder
 {
@@ -234,6 +234,12 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
     UITableViewCell *cell = [self cellForRowAtIndexPath:indexPath];
     [cell setSelected:NO animated:NO];
     [cell setHighlighted:NO animated:NO];
+    
+    if ([self limitDragTargetToAccessoryView] && !CGRectContainsPoint(cell.accessoryView.bounds, [gestureRecognizer locationInView:cell.accessoryView]))
+    {
+        HPGestureRecognizerCancel(gestureRecognizer);
+        return;
+    }
     
     UIImage *image = HPImageFromView(cell);
     _reorderDragView.image = image;
