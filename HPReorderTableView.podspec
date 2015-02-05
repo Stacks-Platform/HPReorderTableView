@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "HPReorderTableView"
-  s.version      = "0.2"
+  s.version      = "0.2.1"
   s.summary      = "Drop-in UITableView replacement to reorder cells with long press on any part of the cell."
   s.screenshot   = "https://raw.githubusercontent.com/hpique/HPReorderTableView/master/Assets/screenshot.png"
   s.homepage     = "https://github.com/hpique/HPReorderTableView"
