@@ -26,7 +26,7 @@
 
 @end
 
-@interface HPReorderTableView()<UITableViewDataSource>
+@interface HPReorderTableView()<UITableViewDataSource,UIGestureRecognizerDelegate>
 
 @end
 
@@ -69,6 +69,8 @@ static NSString *HPReorderTableViewCellReuseIdentifier = @"HPReorderTableViewCel
 - (void)initHelper
 {
     _reorderGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(recognizeLongPressGestureRecognizer:)];
+    _reorderGestureRecognizer.delegate = self;
+    _reorderGestureRecognizer.minimumPressDuration = 0.1;
     [self addGestureRecognizer:_reorderGestureRecognizer];
     
     _reorderDragView = [[UIImageView alloc] init];
@@ -127,7 +129,8 @@ static NSString *HPReorderTableViewCellReuseIdentifier = @"HPReorderTableViewCel
     }
     else
     {
-        return [_realDataSource tableView:tableView cellForRowAtIndexPath:indexPath];
+        UITableViewCell *cell = [_realDataSource tableView:tableView cellForRowAtIndexPath:indexPath];
+        return cell;
     }
 }
 
@@ -221,25 +224,35 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
     _reorderDragView.layer.shadowOpacity = toValue;
 }
 
-- (void)didBeginLongPressGestureRecognizer:(UILongPressGestureRecognizer*)gestureRecognizer
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
-    const CGPoint location = [gestureRecognizer locationInView:self];
+    // any gesture recogniser other than our own should just begin normally
+    if (![gestureRecognizer isEqual:_reorderGestureRecognizer])
+        return YES;
+    
+    const CGPoint location = [touch locationInView:self];
     NSIndexPath *indexPath = [self indexPathForRowAtPoint:location];
     if (indexPath == nil || ![self canMoveRowAtIndexPath:indexPath])
-    {
-        HPGestureRecognizerCancel(gestureRecognizer);
-        return;
-    }
+        return NO;
     
     UITableViewCell *cell = [self cellForRowAtIndexPath:indexPath];
     [cell setSelected:NO animated:NO];
     [cell setHighlighted:NO animated:NO];
     
-    if ([self limitDragTargetToAccessoryView] && !CGRectContainsPoint(cell.accessoryView.bounds, [gestureRecognizer locationInView:cell.accessoryView]))
-    {
-        HPGestureRecognizerCancel(gestureRecognizer);
-        return;
-    }
+    if ([self limitDragTargetToAccessoryView] && !CGRectContainsPoint(cell.accessoryView.bounds, [touch locationInView:cell.accessoryView]))
+        return NO;
+    
+    return YES;
+}
+
+- (void)didBeginLongPressGestureRecognizer:(UILongPressGestureRecognizer*)gestureRecognizer
+{
+    const CGPoint location = [gestureRecognizer locationInView:self];
+    NSIndexPath *indexPath = [self indexPathForRowAtPoint:location];
+    
+    UITableViewCell *cell = [self cellForRowAtIndexPath:indexPath];
+    [cell setSelected:NO animated:NO];
+    [cell setHighlighted:NO animated:NO];
     
     UIImage *image = HPImageFromView(cell);
     _reorderDragView.image = image;
@@ -294,7 +307,7 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
                          [self reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
                          [self performSelector:@selector(removeReorderDragView) withObject:nil afterDelay:0]; // Prevent flicker
                          if ([self.delegate respondsToSelector:@selector(tableView: didEndReorderingRowAtIndexPath:)]) {
-                           [self.delegate tableView:self didEndReorderingRowAtIndexPath:indexPath];
+                             [self.delegate tableView:self didEndReorderingRowAtIndexPath:indexPath];
                          }
                      }];
 }
