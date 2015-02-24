@@ -72,7 +72,7 @@ static NSString *HPReorderTableViewCellReuseIdentifier = @"HPReorderTableViewCel
     _reorderGestureRecognizer.delegate = self;
     _reorderGestureRecognizer.minimumPressDuration = 0.1;
     [self addGestureRecognizer:_reorderGestureRecognizer];
-    
+
     _reorderDragView = [[UIImageView alloc] init];
     _reorderDragView.layer.shadowColor = [UIColor blackColor].CGColor;
     _reorderDragView.layer.shadowRadius = 2;
@@ -235,7 +235,7 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
     NSIndexPath *indexPath = [self indexPathForRowAtPoint:location];
     if (indexPath == nil || ![self canMoveRowAtIndexPath:indexPath])
         return NO;
-    
+        
     UITableViewCell *cell = [self cellForRowAtIndexPath:indexPath];
     [cell setSelected:NO animated:NO];
     [cell setHighlighted:NO animated:NO];
@@ -308,7 +308,7 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
                          [self reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
                          [self performSelector:@selector(removeReorderDragView) withObject:nil afterDelay:0]; // Prevent flicker
                          if ([self.delegate respondsToSelector:@selector(tableView: didEndReorderingRowAtIndexPath:)]) {
-                             [self.delegate tableView:self didEndReorderingRowAtIndexPath:indexPath];
+                           [self.delegate tableView:self didEndReorderingRowAtIndexPath:indexPath];
                          }
                      }];
 }
@@ -435,6 +435,10 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
 {
     const CGPoint location  = [gesture locationInView:self];
     NSIndexPath *toIndexPath = [self indexPathForRowAtPoint:location];
+    
+    // no cell there
+    if (toIndexPath == nil)
+        return;
     
     if ([self.delegate respondsToSelector:@selector(tableView:targetIndexPathForMoveFromRowAtIndexPath:toProposedIndexPath:)])
     {
