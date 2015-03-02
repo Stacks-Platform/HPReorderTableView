@@ -72,7 +72,7 @@ static NSString *HPReorderTableViewCellReuseIdentifier = @"HPReorderTableViewCel
     _reorderGestureRecognizer.delegate = self;
     _reorderGestureRecognizer.minimumPressDuration = 0.1;
     [self addGestureRecognizer:_reorderGestureRecognizer];
-
+    
     _reorderDragView = [[UIImageView alloc] init];
     _reorderDragView.layer.shadowColor = [UIColor blackColor].CGColor;
     _reorderDragView.layer.shadowRadius = 2;
@@ -235,13 +235,17 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
     NSIndexPath *indexPath = [self indexPathForRowAtPoint:location];
     if (indexPath == nil || ![self canMoveRowAtIndexPath:indexPath])
         return NO;
-        
+    
     UITableViewCell *cell = [self cellForRowAtIndexPath:indexPath];
     [cell setSelected:NO animated:NO];
     [cell setHighlighted:NO animated:NO];
     
-    if ([self limitDragTargetToAccessoryView] && !CGRectContainsPoint(cell.accessoryView.bounds, [touch locationInView:cell.accessoryView]))
-        return NO;
+    if ([self limitDragTargetToAccessoryView])
+    {
+        // we want from the start of the accessory view to the edge of the cell
+        CGRect accessoryRect = CGRectMake(cell.accessoryView.frame.origin.x, cell.accessoryView.frame.origin.y, cell.frame.size.width - cell.accessoryView.frame.origin.x, cell.accessoryView.frame.size.height);
+        return CGRectContainsPoint(accessoryRect, [touch locationInView:cell]);
+    }
     
     return YES;
 }
@@ -308,7 +312,7 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
                          [self reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
                          [self performSelector:@selector(removeReorderDragView) withObject:nil afterDelay:0]; // Prevent flicker
                          if ([self.delegate respondsToSelector:@selector(tableView: didEndReorderingRowAtIndexPath:)]) {
-                           [self.delegate tableView:self didEndReorderingRowAtIndexPath:indexPath];
+                             [self.delegate tableView:self didEndReorderingRowAtIndexPath:indexPath];
                          }
                      }];
 }
