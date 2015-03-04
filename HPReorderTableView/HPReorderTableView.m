@@ -72,7 +72,7 @@ static NSString *HPReorderTableViewCellReuseIdentifier = @"HPReorderTableViewCel
     _reorderGestureRecognizer.delegate = self;
     _reorderGestureRecognizer.minimumPressDuration = 0.1;
     [self addGestureRecognizer:_reorderGestureRecognizer];
-    
+
     _reorderDragView = [[UIImageView alloc] init];
     _reorderDragView.layer.shadowColor = [UIColor blackColor].CGColor;
     _reorderDragView.layer.shadowRadius = 2;
@@ -201,7 +201,7 @@ static NSString *HPReorderTableViewCellReuseIdentifier = @"HPReorderTableViewCel
 static UIImage* HPImageFromView(UIView *view)
 {
     UIGraphicsBeginImageContextWithOptions(view.bounds.size, YES, 0);
-    [view.layer renderInContext:UIGraphicsGetCurrentContext()];
+    [view drawViewHierarchyInRect:view.bounds afterScreenUpdates:YES];
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;
@@ -236,10 +236,13 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
     NSIndexPath *indexPath = [self indexPathForRowAtPoint:location];
     if (indexPath == nil || ![self canMoveRowAtIndexPath:indexPath])
         return NO;
-    
+        
     UITableViewCell *cell = [self cellForRowAtIndexPath:indexPath];
     [cell setSelected:NO animated:NO];
     [cell setHighlighted:NO animated:NO];
+    
+    if ([cell conformsToProtocol:@protocol(HPReorderTableViewCellDelegate)])
+        return [((UITableViewCell<HPReorderTableViewCellDelegate> *)cell) tableView:self shouldReceiveTouch:touch];
     
     if ([self limitDragTargetToAccessoryView])
     {
@@ -313,7 +316,7 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
                          [self reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
                          [self performSelector:@selector(removeReorderDragView) withObject:nil afterDelay:0]; // Prevent flicker
                          if ([self.delegate respondsToSelector:@selector(tableView: didEndReorderingRowAtIndexPath:)]) {
-                             [self.delegate tableView:self didEndReorderingRowAtIndexPath:indexPath];
+                           [self.delegate tableView:self didEndReorderingRowAtIndexPath:indexPath];
                          }
                      }];
 }
