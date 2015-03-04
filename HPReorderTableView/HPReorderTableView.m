@@ -79,6 +79,7 @@ static NSString *HPReorderTableViewCellReuseIdentifier = @"HPReorderTableViewCel
     _reorderDragView.layer.shadowOpacity = 0.5;
     _reorderDragView.layer.shadowOffset = CGSizeMake(0, 0);
     _reorderDragView.layer.masksToBounds = NO;
+    _reorderDragView.alpha = 0.9f;
     
     // Data Source forwarding
     [super setDataSource:self];
