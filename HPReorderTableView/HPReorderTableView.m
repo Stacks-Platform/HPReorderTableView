@@ -89,6 +89,8 @@ static NSString *HPReorderTableViewCellReuseIdentifier = @"HPReorderTableViewCel
     // Data Source forwarding
     [super setDataSource:self];
     [self registerTemporaryEmptyCellClass:[HPReorderPlaceholderCell class]];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willResignActive) name:UIApplicationWillResignActiveNotification object:nil];
 }
 
 #pragma mark - Public
@@ -156,6 +158,7 @@ static NSString *HPReorderTableViewCellReuseIdentifier = @"HPReorderTableViewCel
 - (void)dealloc
 { // Data Source forwarding
     self.delegate = nil;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)forwardInvocation:(NSInvocation *)invocation
@@ -324,6 +327,11 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
                            [self.delegate tableView:self didEndReorderingRowAtIndexPath:indexPath];
                          }
                      }];
+}
+
+- (void)willResignActive
+{
+    [self didEndLongPressGestureRecognizer:_reorderGestureRecognizer];
 }
 
 - (void)removeReorderDragView
