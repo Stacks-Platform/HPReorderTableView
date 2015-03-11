@@ -26,6 +26,11 @@
 
 @end
 
+
+@interface HPReorderPlaceholderCell : UITableViewCell
+
+@end
+
 @interface HPReorderTableView()<UITableViewDataSource,UIGestureRecognizerDelegate>
 
 @end
@@ -83,7 +88,7 @@ static NSString *HPReorderTableViewCellReuseIdentifier = @"HPReorderTableViewCel
     
     // Data Source forwarding
     [super setDataSource:self];
-    [self registerTemporaryEmptyCellClass:[UITableViewCell class]];
+    [self registerTemporaryEmptyCellClass:[HPReorderPlaceholderCell class]];
 }
 
 #pragma mark - Public
@@ -475,6 +480,16 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
     {
         return [self.hp_realDataSource tableView:tableView commitEditingStyle:editingStyle forRowAtIndexPath:indexPath];
     }
+}
+
+@end
+
+@implementation HPReorderPlaceholderCell
+
+- (void)didAddSubview:(UIView *)subview
+{
+    if (![subview isKindOfClass:NSClassFromString([@"UITableViewCell" stringByAppendingString:@"ContentView"])])
+        subview.alpha = 0.f;
 }
 
 @end

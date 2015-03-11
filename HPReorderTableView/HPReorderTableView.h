@@ -24,6 +24,12 @@
 - (void)tableView:(UITableView *)tableView didEndReorderingRowAtIndexPath:(NSIndexPath *)indexPath;
 @end
 
+@protocol HPReorderTableViewCellDelegate <NSObject>
+
+- (BOOL)tableView:(UITableView *)tableView shouldReceiveTouch:(UITouch *)touch;
+
+@end
+
 /**
  Table view with drag-and-drop reordering of cells.
  @discussion If you need the default swipe-to-delete functionality, use @c HPReorderAndSwipeToDeleteTableView instead.
