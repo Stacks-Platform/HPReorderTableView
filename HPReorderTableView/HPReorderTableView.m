@@ -267,6 +267,10 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
     const CGPoint location = [gestureRecognizer locationInView:self];
     NSIndexPath *indexPath = [self indexPathForRowAtPoint:location];
     
+    id<HPReorderTableViewDelegate> delegate = self.delegate;
+    if (delegate != nil && [delegate respondsToSelector:@selector(tableView:willBeginReorderingRowAtIndexPath:)])
+        [delegate tableView:self willBeginReorderingRowAtIndexPath:indexPath];
+    
     UITableViewCell *cell = [self cellForRowAtIndexPath:indexPath];
     [cell setSelected:NO animated:NO];
     [cell setHighlighted:NO animated:NO];
