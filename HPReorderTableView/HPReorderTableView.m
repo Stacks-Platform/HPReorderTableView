@@ -134,6 +134,7 @@ static NSString *HPReorderTableViewCellReuseIdentifier = @"HPReorderTableViewCel
     {
         UITableViewCell *cell = [self dequeueReusableCellWithIdentifier:HPReorderTableViewCellReuseIdentifier];
         cell.backgroundColor = [UIColor clearColor];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.accessoryType = UITableViewCellAccessoryNone;
         return cell;
     }
