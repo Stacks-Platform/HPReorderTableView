@@ -76,6 +76,7 @@ static NSString *HPReorderTableViewCellReuseIdentifier = @"HPReorderTableViewCel
     _reorderGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(recognizeLongPressGestureRecognizer:)];
     _reorderGestureRecognizer.delegate = self;
     _reorderGestureRecognizer.minimumPressDuration = 0.1;
+    _reorderGestureRecognizer.cancelsTouchesInView = NO;
     [self addGestureRecognizer:_reorderGestureRecognizer];
 
     _reorderDragView = [[UIImageView alloc] init];
@@ -480,6 +481,23 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
     if (toCellLocation.y <= toHeight - originalHeight) return;
     
     [self reorderCurrentRowToIndexPath:toIndexPath];
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = touches.anyObject;
+    const CGPoint location  = [touch locationInView:self];
+    NSIndexPath *indexPath = [self indexPathForRowAtPoint:location];
+
+    if (indexPath != nil)
+    {
+        UITableViewCell *cell = [self cellForRowAtIndexPath:indexPath];
+        
+        if (cell != nil && [cell conformsToProtocol:@protocol(HPReorderTableViewCellDelegate)] && [((UITableViewCell<HPReorderTableViewCellDelegate> *)cell) tableView:self shouldReceiveTouch:touch])
+            return;
+    }
+    
+    [super touchesBegan:touches withEvent:event];
 }
 
 @end
