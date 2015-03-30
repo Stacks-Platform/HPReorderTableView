@@ -55,6 +55,11 @@
 @property (nonatomic) BOOL limitDragTargetToAccessoryView;
 
 /**
+ * Whether touch events should be handled or not
+**/
+@property (nonatomic, getter=shouldHandleTouchEvents) BOOL handleTouchEvents;
+
+/**
  Provide your UITableViewCell subclass to set the appeareance of the temporary empty cell during dragging. An empty UITableViewCell is used by default, which leaves the empty space white.
  */
 - (void)registerTemporaryEmptyCellClass:(Class)cellClass;
