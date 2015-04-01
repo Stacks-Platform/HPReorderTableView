@@ -78,6 +78,8 @@ static NSString *HPReorderTableViewCellReuseIdentifier = @"HPReorderTableViewCel
     _reorderGestureRecognizer.minimumPressDuration = 0.1;
     _reorderGestureRecognizer.cancelsTouchesInView = NO;
     [self addGestureRecognizer:_reorderGestureRecognizer];
+    
+    self.handleTouchEvents = YES;
 
     _reorderDragView = [[UIImageView alloc] init];
     _reorderDragView.layer.shadowColor = [UIColor blackColor].CGColor;
