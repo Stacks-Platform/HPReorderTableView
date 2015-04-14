@@ -352,6 +352,7 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
 {
     [self beginUpdates];
 
+//    [self moveRowAtIndexPath:toIndexPath toIndexPath:_reorderCurrentIndexPath];
     [self moveRowAtIndexPath:_reorderCurrentIndexPath toIndexPath:toIndexPath];
     if ([self.dataSource respondsToSelector:@selector(tableView:moveRowAtIndexPath:toIndexPath:)])
     {
@@ -401,7 +402,24 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
     // don't let it go past the top or the bottom too far
     if (location.y >= 0 && location.y <= self.contentSize.height + 50)
     {
-        _reorderDragView.center = CGPointMake(self.center.x, location.y);
+        id<HPReorderTableViewDelegate> delegate = self.delegate;
+        if (delegate != nil && [delegate respondsToSelector:@selector(rectForConstrainingCellDraggingInTableView:)])
+        {
+            CGRect rect = [delegate rectForConstrainingCellDraggingInTableView:self];
+            if (CGRectEqualToRect(rect, CGRectZero) || CGRectContainsPoint(rect, location))
+                _reorderDragView.center = CGPointMake(self.center.x, location.y);
+            
+            // move as close as we can above or below as directed
+            else if (!CGRectEqualToRect(rect, CGRectZero))
+            {
+                if (CGRectGetMinY(rect) > location.y)
+                    _reorderDragView.center = CGPointMake(self.center.x, CGRectGetMinY(rect));
+                else if (CGRectGetMaxY(rect) < location.y)
+                    _reorderDragView.center = CGPointMake(self.center.x, CGRectGetMaxY(rect));
+            }
+
+        } else
+            _reorderDragView.center = CGPointMake(self.center.x, location.y);
     }
     
     CGRect rect = self.bounds;
@@ -456,7 +474,24 @@ static void HPGestureRecognizerCancel(UIGestureRecognizer *gestureRecognizer)
     
     if (location.y >= 0 && location.y <= self.contentSize.height + 50)
     {
-        _reorderDragView.center = CGPointMake(self.center.x, location.y);
+        id<HPReorderTableViewDelegate> delegate = self.delegate;
+        if (delegate != nil && [delegate respondsToSelector:@selector(rectForConstrainingCellDraggingInTableView:)])
+        {
+            CGRect rect = [delegate rectForConstrainingCellDraggingInTableView:self];
+            if (CGRectEqualToRect(rect, CGRectZero) || CGRectContainsPoint(rect, location))
+                _reorderDragView.center = CGPointMake(self.center.x, location.y);
+
+            // move as close as we can above or below as directed
+            else if (!CGRectEqualToRect(rect, CGRectZero))
+            {
+                if (CGRectGetMinY(rect) > location.y)
+                    _reorderDragView.center = CGPointMake(self.center.x, CGRectGetMinY(rect));
+                else if (CGRectGetMaxY(rect) < location.y)
+                    _reorderDragView.center = CGPointMake(self.center.x, CGRectGetMaxY(rect));
+            }
+            
+        } else
+            _reorderDragView.center = CGPointMake(self.center.x, location.y);
     }
     
     [self updateCurrentLocation:gesture];
