@@ -23,6 +23,7 @@
 @optional
 - (void)tableView:(UITableView *)tableView willBeginReorderingRowAtIndexPath:(NSIndexPath *)indexPath;
 - (void)tableView:(UITableView *)tableView didEndReorderingRowAtIndexPath:(NSIndexPath *)indexPath;
+- (CGRect)rectForConstrainingCellDraggingInTableView:(UITableView *)tableView;
 @end
 
 @protocol HPReorderTableViewCellDelegate <NSObject>
